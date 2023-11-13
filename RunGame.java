@@ -1,4 +1,3 @@
-import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -9,18 +8,15 @@ import java.util.Scanner;
  */
 public class RunGame {
     private static User user = new User();
+    private static Player player = new Player("");
     private static final Dungeon dungeon = new Dungeon();
     private static final Utility utility = new Utility();
 
     private static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-
-        System.out.println("Welcome to Dungeon Crawler!");
         utility.userDataFile("Users.csv");
         main_menu();
-
-
     }
 
     /**
@@ -28,11 +24,10 @@ public class RunGame {
      * can take before starting a game
      */
     public static void main_menu(){
-
         System.out.println("-----Main Menu-----");
         System.out.println("a. Register");
         System.out.println("b. Login");
-        System.out.println("c. Exit");
+        System.out.println("Type 'EXIT' to exit program");
 
         String option = sc.next();
 
@@ -43,7 +38,7 @@ public class RunGame {
             case "b":
                 login();
                 break;
-            case "c":
+            case "EXIT":
                 break;
             default:
                 System.out.println("This input is invalid. Try Again.");
@@ -57,26 +52,30 @@ public class RunGame {
      */
     public static void login_menu(){
         System.out.println("-----Main Menu-----");
-        System.out.println("a. Logout");
+        System.out.println("a. Continue");
         System.out.println("b. New Game");
-        System.out.println("c. Exit");
+        System.out.println("c. Logout");
+
+        System.out.println("Type 'EXIT' to exit program");
 
         String option = sc.next();
 
-        switch (option) {
+        switch(option){
             case "a":
-                logout();
-                main_menu();
+                load_game();
                 break;
             case "b":
                 new_game();
                 break;
             case "c":
-                utility.updateUser(user.getUsername());
+                logout();
+                break;
+            case "EXIT":
                 break;
             default:
-                System.out.println("This input is invalid. Try Again.");
-                main_menu();
+                System.out.println("Invalid input");
+                login_menu();
+                break;
         }
     }
 
@@ -104,9 +103,9 @@ public class RunGame {
         String dateOfBirth = sc.next();
         utility.registerUser(state,username,firstname,pin,lastname,city,zip,dateOfBirth);
         System.out.println("Registration Complete!");
+        Log.msg(username + " has registered");
         login();
     }
-
 
     /**
      * The login method asks the user for his credentials and
@@ -121,29 +120,25 @@ public class RunGame {
         System.out.print("Enter PIN: ");
         String pin = sc.next();
 
-
-
         if(utility.checkUser(username, pin)){
             user.setUsername(username);
             user.setPin(pin);
-            utility.updateUser(username);
+            //Login time registration
+            Log.msg("User "+ user.getUsername() + " logged in");
             login_menu();
         }else {
             System.out.println("Username or Password maybe be wrong. Try Again");
             login();
         }
-
-
     }
-
 
     /**
      * The logout class updates the users file with the
      * total time played.
      */
     public static void logout(){
-        utility.updateUser(user.getUsername());
-        user = new User();
+        //logout time registration
+        Log.msg("User "+ user.getUsername() + " logged out");
         main_menu();
     }
 
@@ -152,32 +147,82 @@ public class RunGame {
      * starts a fresh game for the users.
      */
     public static void new_game(){
-        System.out.println("New Game Method");
+        System.out.print("Enter a name for your character: ");
+        player.set_name(sc.next());
         dungeon.setMap(utility.readDungeon("Dungeon.csv"));
+        game();
+    }
+
+    /**
+     * The load_game reads the save file to restore the previous game the user left
+     */
+    public static void load_game(){
+        dungeon.setMap(utility.readDungeon(user.getUsername()+"savedDungeon.csv"));
         game();
     }
 
     /**
      * The game method controls the flow of the game updating the log.
      */
-    private static void game() {
-        int x;
-        int y;
-        while(true){
-            dungeon.printMap();
-            System.out.print("Enter the room you want to go into as 'x y'. enter '-1 -1' to exit to main menu\n> ");
-            x = sc.nextInt();
-            y = sc.nextInt();
-            if(x == -1 || y == -1){
-                if(!user.getUsername().equals("unknown")) {
-                    login_menu();
-                }else {
-                    main_menu();
-                }
-                break;
+    public static void game(){
+
+        int[] position = player.getPosition();
+        dungeon.updatePlayerPosition(position[1], position[0]);
+        int game = 1;
+        while(game == 1){
+            System.out.println("Use WASD and the Enter key to move across the dungeon(Enter -1 to exit to menu)");
+            String input = sc.next();
+            switch (input){
+                case "w":
+                    if(dungeon.isMovePossible(position[1] - 1, position[0])){
+                        dungeon.updateExploredCell(position[1], position[0]);
+                        position[1]--;
+                        dungeon.updatePlayerPosition(position[1], position[0]);
+                        player.setPosition(position[0], position[1]);
+                    }
+                    break;
+                case "s":
+                    if(dungeon.isMovePossible(position[1] + 1, position[0])){
+                        dungeon.updateExploredCell(position[1], position[0]);
+                        position[1]++;
+                        dungeon.updatePlayerPosition(position[1], position[0]);
+                        player.setPosition(position[0], position[1]);
+                    }
+                case "a":
+                    if(dungeon.isMovePossible(position[1], position[0] - 1)){
+                        dungeon.updateExploredCell(position[1], position[0]);
+                        position[0]--;
+                        dungeon.updatePlayerPosition(position[1], position[0]);
+                        player.setPosition(position[0], position[1]);
+                    }
+                    break;
+                case "d":
+                    if(dungeon.isMovePossible(position[1], position[0] + 1)){
+                        dungeon.updateExploredCell(position[1], position[0]);
+                        position[0]++;
+                        dungeon.updatePlayerPosition(position[1], position[0]);
+                        player.setPosition(position[0], position[1]);
+                    }
+                    break;
+                case "-1":
+                    saveGame();
+                    game = -1;
+                    break;
+                default:
+                    System.out.println("This is invalid input");
+                    break;
             }
-            //dungeon.placePlayer(x, y);
-            Log.msg("User "+ user.getUsername() + " player moved to ("+x+", "+y+") in the dungeon");
         }
     }
+
+    /**
+     * The saveGame method save the current state of the dungeon for future use.
+     */
+
+    private static void saveGame() {
+        String saveFile = user.getUsername() + "SaveFile.csv";
+        utility.saveGame(saveFile, dungeon);
+    }
+
+
 }
