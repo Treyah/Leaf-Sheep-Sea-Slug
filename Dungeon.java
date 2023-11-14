@@ -1,8 +1,9 @@
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * This is the Dungeon class that sets and gets the dungeon map from the utility class
@@ -12,7 +13,6 @@ import java.util.Map;
 class Dungeon {
 
     private Map<String, Map<String, String>> map;
-
 
     /**
      * This method sets the dungeonMap gathered from the Utility Class
@@ -74,45 +74,56 @@ class Dungeon {
     }
 
     /**
-     * Checks if the next move by the player is possible.
-     *
-     * @param row The row coordinate of the next move.
-     * @param col The column coordinate of the next move.
+    * Checks if the next move by the player is possible.
+    *
+    * @param row 
+     * @param col 
      * @return true if the move is possible, false otherwise.
      */
     public boolean isMovePossible(int row, int col) {
-        if (map == null || row < 0 || row >= map.size()) {
-            return false;
-        }
+      if (map == null || row < 0 || row >= map.size()) {
+          return false;
+      }
 
-        Map<String, String> rowMap = map.get(String.valueOf(row));
-        return rowMap != null && col >= 0 && col < rowMap.size();
+     Map<String, String> rowMap = map.get(String.valueOf(row));
+     if (rowMap == null || col < 0 || col >= rowMap.size()) {
+         return false;
     }
 
+    // Checks if the cell contains a wall 
+    String cellValue = rowMap.get(String.valueOf(col));
+    return cellValue != null && !cellValue.equals("|");
+    }
 
     /**
-    * This method updates the cells that the player has explored 
-    * Cells that a player has explored are marked as x,
-    * and cells that a player has not explored are marked u.
-    *
-    */
-    public void updateExploredCell(int playerRow, int playerCol) {
+ * This method updates the cells that the player has explored.
+ * Cells are initially set as "u" for unexplored
+ * and when the player explores the cell, it is set to "x".
+ *
+ * @param playerRow The row coordinate of the player.
+ * @param playerCol The column coordinate of the player.
+ */
+public void updateExploredCell(int playerRow, int playerCol) {
+    if (map != null) {
         for (Map.Entry<String, Map<String, String>> entry : map.entrySet()) {
             String rowKey = entry.getKey();
             Map<String, String> rowMap = entry.getValue();
 
-        for (Map.Entry<String, String> cellEntry : rowMap.entrySet()) {
-            String colKey = cellEntry.getKey();
-            if (Integer.parseInt(rowKey) == playerRow && Integer.parseInt(colKey) == playerCol) {
-              // If the cell has been explored it will appear as x
-                rowMap.put(colKey, "x");
-            } else {
-              // If the cell has not been explored it will appear as u
-                rowMap.put(colKey, "u");
+            for (Map.Entry<String, String> cellEntry : rowMap.entrySet()) {
+                String colKey = cellEntry.getKey();
+                if (Integer.parseInt(rowKey) == playerRow && Integer.parseInt(colKey) == playerCol) {
+                    // If the cell has been explored, it will appear as "x"
+                    if (cellEntry.getValue().equals("0")) {
+                        rowMap.put(colKey, "x");
+                    } else {
+                        rowMap.put(colKey, "u");
+                    }
+                }
             }
         }
-        }
     }
+}
+
 
     /**
      * Updates the player's position and displays it in the dungeon.
@@ -122,7 +133,7 @@ class Dungeon {
     */
     public void updatePlayerPosition(int playerRow, int playerCol) {
         if (isMovePossible(playerRow, playerCol)) {
-           // Update the player's position in the dungeon
+           // Updates the player's position in the dungeon
            map.get(String.valueOf(playerRow)).put(String.valueOf(playerCol), "$");
 
           // Print the updated dungeon map
@@ -131,51 +142,31 @@ class Dungeon {
          System.out.println("Invalid move. Player position remains unchanged.");
      }
     }
-    
-}
-=======
-/**
- * This is the Dungeon class that sets and gets the dungeon map from the utility class
- * and prints the dungeon map
- * @author Edgar Arellano
- */
-public class Dungeon {
-    private String[][] map;
 
-    /**
-     * Getter method to return the map
-     * @return this method returns the dungeon map
-     */
-    public String[][] getMap(){
-        return map;
-    }
-
-    /**
-     * This method sets the dungeonMap gathered from the Utility Class
-     * @param dungeonMap
-     */
-    public void setMap(String[][] dungeonMap){
-        this.map = dungeonMap;
-    }
-
-    /**
-     * Print method to print out the dungeon map
+     /**
+     * Randomize items in a chest at the specified location.
      *
+     * @param chestRow The row coordinate of the chest.
+     * @param chestCol The column coordinate of the chest.
      */
-    public void printMap(){
-        for (String[] strings : map) {
-            for (String string : strings) {
-                if (string.equals("-1")) {
-                    System.out.print("| ");
-                } else {
-                    System.out.print(string + " ");
-                }
+    public void generateRandomItem(int chestRow, int chestCol) {
+        if (isMovePossible(chestRow, chestCol)) {
+            String rowKey = String.valueOf(chestRow);
+            String colKey = String.valueOf(chestCol);
+    
+            if (map.containsKey(rowKey) && map.get(rowKey).containsKey(colKey) && map.get(rowKey).get(colKey).equals("0")) {
+                List<String> items = new ArrayList<>(Arrays.asList("Sword Upgrade", "Health Upgrade", "Clear Potion", "Smoke Bomb", "Coins"));
+    
+                Random random = new Random();
+                String randomItem = items.get(random.nextInt(items.size()));
+    
+                // Updates the chest with the random item
+                map.get(rowKey).put(colKey, randomItem);
+    
+                System.out.println("You found: " + randomItem);
+                printMap();
             }
-            System.out.println();
         }
     }
-
-    public void placePlayer(int x, int y) {
-    }
+    
 }
-
