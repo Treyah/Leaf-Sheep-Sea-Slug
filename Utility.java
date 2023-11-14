@@ -3,6 +3,9 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,6 +20,7 @@ import java.util.Map;
 
 class Utility {
     private Map<String, Map<String, String>> userDataMap;
+    private static final Path updated_users = Paths.get("updatedUsers.csv");
 
     public void userDataFile(String userFile){
         this.userDataMap = readUserInfo(userFile);
@@ -96,6 +100,37 @@ class Utility {
     }
 
     /**
+     * updateUsers creates if not already existing new file with the updates on users
+     */
+    public void updateUsers(){
+        String text = "State,LastSignIn,Username,First Name,LogInTime,PIN,Last Name,TotalPlaytime,City,Zip,Date of Birth\n";
+
+        try{
+            if (!Files.exists(updated_users)) {
+                Files.createFile(updated_users);
+            }
+
+            FileWriter writer = new FileWriter("updatedUsers.csv");
+            writer.write(text);
+            writer.close();
+
+            FileWriter fw = new FileWriter("updatedUsers.csv", true);
+
+            for(Map.Entry<String, Map<String, String>> entry: userDataMap.entrySet()){
+                String user = entry.getKey();
+                Map<String, String> userInfo = userDataMap.get(user);
+                String info = userInfo.get("State") + "," + userInfo.get("LastSignIn") + "," + userInfo.get("Username") + "," + userInfo.get("First Name") + "," + userInfo.get("LogInTime") + "," + userInfo.get("PIN")
+                        + "," + userInfo.get("Last Name") + "," + userInfo.get("TotalPlaytime") + "," + userInfo.get("City") + "," + userInfo.get("Zip") + "," + userInfo.get("Date of Birth") + "\n";
+                fw.write(info);
+            }
+
+            fw.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Allows the user to register as new user with the parameters as inputs
      * 
      * @param state
@@ -110,16 +145,21 @@ class Utility {
 
     public void registerUser(String state, String username, String firstname, String password, String lastName, String city, String zip, String dateOfBirth) {
         Map<String, String> newUser = new HashMap<>();
-        newUser.put("state", state);
-        newUser.put("username", username);
-        newUser.put("firstname", firstname);
-        newUser.put("password", password);
-        newUser.put("lastName", lastName);
-        newUser.put("city", city);
-        newUser.put("zip", zip);
-        newUser.put("dateOfBirth", dateOfBirth);
+        newUser.put("State", state);
+        newUser.put("LastSignIn", "0");
+        newUser.put("Username", username);
+        newUser.put("First Name", firstname);
+        newUser.put("LogInTime", "0");
+        newUser.put("PIN", password);
+        newUser.put("Last Name", lastName);
+        newUser.put("TotalPlaytime", "0");
+        newUser.put("City", city);
+        newUser.put("Zip", zip);
+        newUser.put("Date of Birth", dateOfBirth);
 
         userDataMap.put(username, newUser);
+
+        updateUsers();
     }
 
      /**
@@ -186,5 +226,9 @@ class Utility {
                 writer.newLine();
             }
         }
+    }
+
+    public void lastSignin(String user) {
+        //do something
     }
 }

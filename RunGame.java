@@ -1,3 +1,5 @@
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -17,7 +19,11 @@ public class RunGame {
     private static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        utility.userDataFile("Users.csv");
+        if(Files.exists(Paths.get("updatedUsers.csv"))){
+            utility.userDataFile("updatedUsers.csv");
+        }else {
+            utility.userDataFile("Users.csv");
+        }
         main_menu();
     }
 
@@ -56,14 +62,20 @@ public class RunGame {
      */
     private static void game_admin() {
         Game_Administrator admin = new Game_Administrator("", "");
-        System.out.print("user: ");
-        String adminName = sc.next();
-        System.out.println("PIN: ");
-        String pin = sc.next();
-        if(utility.checkUser(adminName, pin)){
-            admin = new Game_Administrator(adminName, pin);
+        while(true) {
+            System.out.print("user: ");
+            String adminName = sc.next();
+            System.out.println("PIN: ");
+            String pin = sc.next();
+            if (utility.checkUser(adminName, pin)) {
+                admin = new Game_Administrator(adminName, pin);
+                break;
+            }else{
+                System.out.println("Invalid");
+            }
         }
         System.out.print("User to look up: ");
+        user.setUsername(sc.next());
         admin.generateAndWriteStatisticsFile(user);
 
     }
@@ -84,9 +96,12 @@ public class RunGame {
 
         switch(option){
             case "a":
-                System.out.println("No saved game");
-                login_menu();
-                //load_game();
+                if(Files.exists(Paths.get("savedDungeon.csv"))){
+                    load_game();
+                }else{
+                    System.out.println("There is no saved file");
+                    login_menu();
+                }
                 break;
             case "b":
                 new_game();
@@ -147,7 +162,7 @@ public class RunGame {
         if(utility.checkUser(username, pin)){
             user.setUsername(username);
             user.setPin(pin);
-            //Login time registration
+            utility.lastSignin(username);
             Log.msg("User "+ user.getUsername() + " logged in");
             login_menu();
         }else {
@@ -183,8 +198,9 @@ public class RunGame {
      * The load_game reads the save file to restore the previous game the user left
      */
     public static void load_game(){
-        dungeon.setMap(utility.readDungeon(user.getUsername()+"savedDungeon.csv"));
-        game();
+//        dungeon.setMap(utility.readDungeon(user.getUsername()+"savedDungeon.csv"));
+//        game();
+        login_menu();
     }
 
     /**
@@ -265,7 +281,7 @@ public class RunGame {
      * The saveGame method save the current state of the dungeon for future use.
      */
     private static void saveGame() {
-        String saveFile = user.getUsername() + "SaveFile.csv";
+        String saveFile = user.getUsername();
         utility.saveGame(saveFile, dungeon, player);
     }
 
