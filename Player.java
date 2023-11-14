@@ -3,7 +3,7 @@
  * Tracks things like player character stats, positions, and
  * handles some actions related to dungeon crawling like
  * attacking, looting, and leveling up
- * 
+ *
  * @author Kelcey Calderon
  */
 public class Player extends Person {
@@ -19,12 +19,13 @@ public class Player extends Person {
 
     /**
      * Initializes a new player with the given name.
-     * 
+     *
      * @param name the name of the player.
      */
     public Player(String name) {
         super(name);
-        this.position = new int[2];
+        int[] coord = {8, 19};
+        this.position = coord;
     }
 
     // getters and setters
@@ -71,66 +72,66 @@ public class Player extends Person {
 
     /**
      * Sets the attack bonus of the player.
-     * 
+     *
      * @param attackBonus the attack bonus to set.
      */
-    private void setAttackBonus(int attackBonus) {
+    public void setAttackBonus(int attackBonus) {
         this.attackBonus = attackBonus;
     }
 
     /**
      * Sets the defense value of the player.
-     * 
+     *
      * @param defense the defense value to set.
      */
-    private void setDefense(int defense) {
+    public void setDefense(int defense) {
         this.defense = defense;
     }
 
     /**
      * Sets the hit points (HP) of the player.
-     * 
+     *
      * @param HP the hit points to set.
      */
-    private void setHP(int HP) {
+    public void setHP(int HP) {
         this.HP = HP;
     }
 
     /**
      * Sets the experience points (XP) of the player.
-     * 
+     *
      * @param XP the experience points to set.
      */
-    private void setXP(int XP) {
+    public void setXP(int XP) {
         this.XP = XP;
     }
 
     /**
      * Sets the amount of gold the player has.
-     * 
+     *
      * @param gold the gold amount to set.
      */
-    private void setGold(int gold) {
+    public void setGold(int gold) {
         this.gold = gold;
     }
 
     /**
      * Sets the position of the player in the dungeon.
-     * 
+     *
      * @param x the x-coordinate of the position.
      * @param y the y-coordinate of the position.
      */
-    private void setPosition(int x, int y) {
+    public void setPosition(int x, int y) {
         this.position[0] = x;
         this.position[1] = y;
     }
 
     /**
      * Sets the level of the player.
-     * 
+     *
      * @param level the level to set.
      */
-    private void setLevel(int level) {
+    public void setLevel(int level) {
         this.level = level;
     }
 
@@ -138,7 +139,7 @@ public class Player extends Person {
      * Sets the poison condition on the player
      * @param poison whether or not the poison condition is on the player
      */
-    private void setPoison(boolean poison) {
+    public void setPoison(boolean poison) {
         this.poison = poison;
     }
 
@@ -148,14 +149,14 @@ public class Player extends Person {
      * Handles the player leveling up.
      * Should be called when needed in gainXP
      */
-    private void levelUp() {
+    public void levelUp() {
         // Stub
         Log.msg("Player leveled up.");
     }
 
     /** Handles the player's attack. */
     public void attack(Enemy enemy) {
-        // Stub
+        enemy.setHP(enemy.getHP()-attackBonus);
         Log.msg("Player attacked");
     }
 
@@ -187,5 +188,13 @@ public class Player extends Person {
     public void useItem(Item item) {
         // Stub
         Log.msg("Player used an item.");
+    }
+
+    public String getInventory() {
+        return "Inventory";
+    }
+
+    public String getStatusEffects() {
+        return "Status effects";
     }
 }
