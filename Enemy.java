@@ -3,7 +3,7 @@
  * 
  * @author Kelcey Calderon
  */
-public class Enemy {
+public class Enemy extends Interface {
 
     private int attackPower;
     private int defense;

@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Represents a player character in a dungeon crawler game.
  * Tracks things like player character stats, positions, and
@@ -6,7 +9,7 @@
  *
  * @author Kelcey Calderon
  */
-public class Player extends Person {
+public class Player extends Interface {
 
     private int attackBonus = 5;
     private int defense;
@@ -16,6 +19,12 @@ public class Player extends Person {
     private int[] position;
     private int level;
     private boolean poison;
+
+    /*
+     Example implementation of an inventory - use a hashmap:
+     https://stackoverflow.com/questions/74963886/objects-as-keys-in-a-hashmap-how-to-reference-them-java
+     */
+    private Map<Item, Integer> inventory = new HashMap<>();
 
     /**
      * Initializes a new player with the given name.
@@ -184,16 +193,60 @@ public class Player extends Person {
         Log.msg("Player opened inventory");
     }
 
-    /** Handles a player using an item */
-    public void useItem(Item item) {
-        // Stub
-        Log.msg("Player used an item.");
+    /* 
+    How to handle getting things from hashmaps:
+    https://www.geeksforgeeks.org/hashmap-getordefaultkey-defaultvalue-method-in-java-with-examples/
+    */
+
+    /**
+     * 
+     * @param item item to add to inventory
+     * @param quantity how many to add
+     */
+    public void addItem(Item item, int quantity) {
+        inventory.put(item, inventory.getOrDefault(item, 0) + quantity);
     }
 
+    /**
+     * 
+     * @param item item to remove from inventory
+     * @param quantity how many to remove
+     */
+    public void removeItem(Item item, int quantity) {
+        int currentQty = inventory.getOrDefault(item, 0);
+        if (currentQty > quantity) {
+            inventory.put(item, currentQty - quantity);
+        } else {
+            inventory.remove(item);
+        }
+    }
+
+    /**
+     * 
+     * @return inventory processed as a string
+     */
     public String getInventory() {
-        return "Inventory";
+        StringBuilder sb = new StringBuilder("Inventory:\n");
+        for (Map.Entry<Item, Integer> entry : inventory.entrySet()) {
+            sb.append(entry.getKey().getName()).append(" x ").append(entry.getValue()).append("\n");
+        }
+        return sb.toString();
     }
 
+    /**
+     * this currently assumes item is used with something like item.use() to apply effects
+     * @param item the item to use
+     */
+    public void useItem(Item item) {
+        if (inventory.containsKey(item) && inventory.get(item) > 0) {
+            // this currently assumes item is used with something like item.use() to apply effects
+            item.use();
+            removeItem(item, 1);
+            Log.msg("Used " + item.itemNameGetter());
+        } else {
+            Log.msg("Item not available in inventory");
+        }
+    }
     public String getStatusEffects() {
         return "Status effects";
     }
