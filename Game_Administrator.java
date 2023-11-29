@@ -35,7 +35,7 @@ public class Game_Administrator extends User {
         statisticsFile += "Number of Items Picked Up Overall: " + user.getItemTotalNum() + "\n";
 
         // Writes the statistics to stats.txt
-        String filePath = "stats.txt";
+        String filePath = user.getUsername()+"Stats.txt";
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(statisticsFile);
             System.out.println("Statistics file created successfully at: " + filePath);

@@ -1,6 +1,5 @@
 public interface Behaivor {
+   void attack(Character character);
 
-    public abstract void attack();
-
-    public abstract void use_item();
+    void useItem(Item item);
 }

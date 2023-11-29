@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The Utility class contains methods to read files 'Dungeon.csv' and 'users.csv' and methods that 
@@ -23,7 +21,29 @@ class Utility {
     private static final Path updated_users = Paths.get("updatedUsers.csv");
 
     public void userDataFile(String userFile){
-        this.userDataMap = readUserInfo(userFile);
+        Map<String, Map<String, String>> userData = new LinkedHashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(userFile))) {
+            String header = reader.readLine();
+            String[] headerColumns = header.split(",");
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] userInfo = line.split(",");
+                Map<String, String> userInfoMap = new HashMap<>();
+
+                if (userInfo.length == headerColumns.length) {
+                    for (int i = 0; i < headerColumns.length; i++) {
+                        userInfoMap.put(headerColumns[i].trim(), userInfo[i].trim());
+                    }
+                    userData.put(userInfoMap.get("Username"), userInfoMap);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.userDataMap = userData;
     }
 
      /**
@@ -55,33 +75,26 @@ class Utility {
     }
        
     /**
-     * This method reads the file 'Users.csv' and stores in a HashMap
-     * @param userFile
+     * This method returns all the info of a certain user
+     * @param targetUser is the person whose info we are trying to get
      */
 
-     public Map<String, Map<String, String>> readUserInfo(String userFile) {
-        Map<String, Map<String, String>> userData = new LinkedHashMap<>();
-    
-        try (BufferedReader reader = new BufferedReader(new FileReader(userFile))) {
-            String header = reader.readLine();
-            String[] headerColumns = header.split(",");
-    
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] userInfo = line.split(",");
-                Map<String, String> userInfoMap = new HashMap<>();
-    
-                if (userInfo.length == headerColumns.length) {
-                    for (int i = 0; i < headerColumns.length; i++) {
-                        userInfoMap.put(headerColumns[i].trim(), userInfo[i].trim());
-                    }
-                    userData.put(userInfoMap.get("Username"), userInfoMap);
-                } 
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return userData;
+     public User getUser(String targetUser) {
+         Map<String, String> userInfo = userDataMap.get(targetUser);
+         User user = new User();
+         user.setState(userInfo.get("State"));
+         user.setLastSignIn(userInfo.get("LastSignIn"));
+         user.setUsername(userInfo.get("Username"));
+         user.setFirstName(userInfo.get("First Name"));
+         user.setLoginTime(userInfo.get("LogInTime"));
+         user.setPin(userInfo.get("PIN"));
+         user.setLastName(userInfo.get("Last Name"));
+         user.setTotalPlaytime(userInfo.get("TotalPlaytime"));
+         user.setCity(userInfo.get("City"));
+         user.setZip(userInfo.get("Zip"));
+         user.setDOB(userInfo.get("Date of Birth"));
+
+         return user;
     }
 
     /**
@@ -102,8 +115,8 @@ class Utility {
     /**
      * updateUsers creates if not already existing new file with the updates on users
      */
-    public void updateUsers(){
-        String text = "State,LastSignIn,Username,First Name,LogInTime,PIN,Last Name,TotalPlaytime,City,Zip,Date of Birth\n";
+    public void updateUsersFile(){
+        String text = "State,LastSignIn,Username,First Name,LogInTime,PIN,Last Name,TotalPlaytime,City,Zip,Date of Birth, battlesWon, battlesLost, itemTotalNum, userGameCompletions\n";
 
         try{
             if (!Files.exists(updated_users)) {
@@ -120,7 +133,8 @@ class Utility {
                 String user = entry.getKey();
                 Map<String, String> userInfo = userDataMap.get(user);
                 String info = userInfo.get("State") + "," + userInfo.get("LastSignIn") + "," + userInfo.get("Username") + "," + userInfo.get("First Name") + "," + userInfo.get("LogInTime") + "," + userInfo.get("PIN")
-                        + "," + userInfo.get("Last Name") + "," + userInfo.get("TotalPlaytime") + "," + userInfo.get("City") + "," + userInfo.get("Zip") + "," + userInfo.get("Date of Birth") + "\n";
+                        + "," + userInfo.get("Last Name") + "," + userInfo.get("TotalPlaytime") + "," + userInfo.get("City") + "," + userInfo.get("Zip") + "," + userInfo.get("Date of Birth")
+                        + "," + userInfo.get("battlesWon") + "," + userInfo.get("battlesLost") + "," + userInfo.get("itemTotalNum") + "," + userInfo.get("userGameCompletions") + "\n";
                 fw.write(info);
             }
 
@@ -159,7 +173,7 @@ class Utility {
 
         userDataMap.put(username, newUser);
 
-        updateUsers();
+        updateUsersFile();
     }
 
      /**
@@ -167,7 +181,7 @@ class Utility {
      * @param username  
      * @param dungeon   
      */
-    public void saveGame(String username, Dungeon dungeon, Player playerAttributes) {
+    public void saveGame(String username, Dungeon dungeon, Player player) {
         try {
             // Save Dungeon State
             String dungeonSaveFile = username + "savedDungeon.csv";
@@ -178,7 +192,7 @@ class Utility {
             // Save Player Attributes
             String playerAttributesSaveFile = username + "Player.csv";
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(playerAttributesSaveFile))) {
-                savePlayerAttributes(writer, playerAttributes);
+                savePlayerAttributes(writer, player);
             }
 
             System.out.println("Game saved successfully.");
@@ -192,17 +206,16 @@ class Utility {
      * Helper method to save the attributes of the player.
      *
      * @param writer  
-     * @param playerAttributes  The player attributes to be saved.
-     * @throws IOException 
+     * @param player  The player attributes to be saved.
+     * @throws IOException
      */
-    private void savePlayerAttributes(BufferedWriter writer, Player playerAttributes) throws IOException {
-    
-        writer.write("HealthPoints," + playerAttributes.getHP());
+    private void savePlayerAttributes(BufferedWriter writer, Player player) throws IOException {
+        writer.write("Name,attackPower,HP,poison,maxHP,gold,position");
         writer.newLine();
-        writer.write("Inventory," + playerAttributes.getInventory());
+        int[] coords = player.getPosition();
+        writer.write(player.getName()+","+player.getAttackPower()+","+player.getHP()+","+player.getPoison()+","+player.getMaxHP()+","+player.getGold()+","+coords[0]+","+coords[1]);
         writer.newLine();
-        writer.write("StatusEffects," + playerAttributes.getStatusEffects());
-        writer.newLine();
+        writer.write(player.getInventory());
         
     }
 
@@ -214,21 +227,88 @@ class Utility {
      * @throws IOException 
      */
     private void saveDungeonState(BufferedWriter writer, Map<String, Map<String, String>> dungeonMap) throws IOException {
-        for (Map.Entry<String, Map<String, String>> entry : dungeonMap.entrySet()) {
-            String rowKey = entry.getKey();
-            Map<String, String> rowMap = entry.getValue();
 
-            for (Map.Entry<String, String> cellEntry : rowMap.entrySet()) {
-                String colKey = cellEntry.getKey();
-                String cellValue = cellEntry.getValue();
+        for (int row = 0; row < 20; row++) {
+            Map<String, String> rowMap = dungeonMap.get(String.valueOf(row));
 
-                writer.write(rowKey + "," + colKey + "," + cellValue);
-                writer.newLine();
+            if (rowMap != null) {
+                List<String> sortedColumns = new ArrayList<>(rowMap.keySet());
+                Collections.sort(sortedColumns);
+
+                for (int col = 0; col < 24; col++) {
+                    String colKey = String.valueOf(col);
+                    String cellValue = rowMap.get(colKey);
+
+                    writer.write(cellValue + ",");
+                }
             }
+            writer.newLine();
         }
+
     }
 
-    public void lastSignin(String user) {
-        //do something
+    public List<Enemy> getEnemies() {
+        List<Enemy> enemies = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("Enemies(1).csv"))) {
+            String header = reader.readLine();
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] enemy = line.split(",");
+                Enemy enemy_character = new Enemy(enemy[0], Integer.parseInt(enemy[1]), Integer.parseInt(enemy[2]));
+                enemies.add(enemy_character);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return enemies;
+    }
+
+    public Player getSavedPlayer(String file) {
+        Player player = new Player("");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String header = reader.readLine();
+
+            String line;
+            line = reader.readLine();
+            String[] playerInfo = line.split(",");
+            player.set_name(playerInfo[0]);
+            player.setAttackPower(Integer.parseInt(playerInfo[1]));
+            player.setHP(Integer.parseInt(playerInfo[2]));
+            player.setPoison(Boolean.parseBoolean(playerInfo[3]));
+            player.setMaxHP(Integer.parseInt(playerInfo[4]));
+            player.setGold(Integer.parseInt(playerInfo[5]));
+            player.setPosition(Integer.parseInt(playerInfo[6]),Integer.parseInt(playerInfo[7]));
+            line = reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] inventory = line.split(",");
+                System.out.println(inventory[0]);
+                switch (inventory[0]) {
+                    case "Sword Upgrade" -> player.addItem(new Sword(inventory[0]), 1);
+                    case "Health Upgrade" -> player.addItem(new Heart(inventory[0]), 1);
+                    case "Clear Potion" -> player.addItem(new clearPotion(inventory[0]), 1);
+                    case "Health Potion" -> player.addItem(new healthPotion(inventory[0]), 1);
+                    case "Smoke Bomb" -> player.addItem(new smokeBomb(inventory[0]),1);
+                    case "Coins" -> player.addItem(new Coin(inventory[0]),1);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return player;
+    }
+
+    public void updateUser(User user) {
+        Map<String, String> userInfo = userDataMap.get(user.getUsername());
+        userInfo.put("LastSignIn", user.getLastSignIn());
+        userInfo.put("LogInTime", user.getLoginTime());
+        userInfo.put("TotalPlaytime", user.getTotalPlaytime());
+        userInfo.put("battlesWon" , String.valueOf(user.getBattlesWon()));
+        userInfo.put("battlesLost", String.valueOf(user.getBattlesLost()));
+        userInfo.put("itemTotalNum", String.valueOf(user.getItemTotalNum()));
+        userInfo.put("userGameCompletions", String.valueOf(user.getGameCompletions()));
+        updateUsersFile();
     }
 }

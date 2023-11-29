@@ -5,23 +5,34 @@ public class Battle_System {
     private Player player;
     private Enemy enemy;
 
-    private Status_Effect statusEffect;
-
     /**
      * Start method sets up the battlefield
      * @param player takes the current player
      * @param enemy takes an enemy object to fight player
      */
-    public void Start(Player player, Enemy enemy){
+    public void Start(Player player, Enemy enemy, User user){
         this.player = player;
         this.enemy = enemy;
         while (player.getHP() != 0 && enemy.getHP() != 0) {
             System.out.println(enemy.getName() + " HP: " + enemy.getHP() + "\n");
             System.out.println("Player HP: " + player.getHP());
-            Player_turn();
+            if(!Player_turn()){
+                break;
+            }
             if(enemy.getHP() > 0) {
                 Enemy_turn();
             }
+        }
+        if(enemy.getHP() <= 0){
+            user.setBattlesWon(user.getBattlesWon()+1);
+        }
+        if(player.getHP() <= 0){
+            user.setBattlesLost(user.getBattlesLost()+1);
+        }
+        if(enemy.getName().equals("DarkKing") && enemy.getHP() <= 0){
+            user.setGameCompletions(user.getGameCompletions()+1);
+            System.out.println("Congratulations! You Defeated the DarkKing!");
+            System.out.println("You Can  Continue in this World or Create a new game in main menu");
         }
     }
 
@@ -29,7 +40,7 @@ public class Battle_System {
      * Player_turn controls the state in which a user
      * can control the player in battle
      */
-    public void Player_turn(){
+    public boolean Player_turn(){
         System.out.println("----------");
         System.out.println("Actions");
         System.out.println("a) attack");
@@ -45,11 +56,11 @@ public class Battle_System {
                 player.attack(enemy);
                 break;
             case "b":
-                Item item = new Item();
-                player.useItem(item);
+                player.openInventory(enemy);
                 break;
             case "c":
-                break;
+                System.out.println("You escaped");
+                return false;
             default:
                 System.out.println("Invalid input. Try Again.");
                 Player_turn();
@@ -59,7 +70,7 @@ public class Battle_System {
         if(player.getPoison() && player.getHP() < 1){
             player.setHP(player.getHP()-1);
         }
-
+        return true;
     }
 
     /**

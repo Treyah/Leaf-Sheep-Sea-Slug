@@ -1,20 +1,30 @@
+import java.util.Date;
+
 /**
  * The User class create an object where we save
  * important information of the user logged in. 
  *
- * @author Trey Holguin
+ * @author Trey Holguín
  * @version 2.0
  */
 public class User{
-    
-    private String username = "unknown";
+
+    private String DOB;
+    private String username;
     private String pin;
     private String lastSignIn;
-    private int battlesWon, battlesLost, itemTotalNum, userGameCompletions;
+    private int battlesWon = 0, battlesLost = 0, itemTotalNum = 0, userGameCompletions = 0, TotalPlaytime = 0;
+    private Date firstTime;
+    private String State;
+    private String firstName;
+    private String loginTime;
+    private String lastName;
+    private String city;
+    private String zip;
 
     /** 
      * Setter method for the user's Username which will be referenced in RunGame.java
-     * @param usernameSetter
+     * @param usernameSetter username to set
      */
     public void setUsername(String usernameSetter){
         this.username = usernameSetter;
@@ -22,7 +32,7 @@ public class User{
     
     /** 
      * Setter method for the user's PIN which will be referenced in RunGame.java
-     * @param pinSetter
+     * @param pinSetter pin to set
      */
     public void setPin(String pinSetter){
         this.pin = pinSetter;
@@ -34,11 +44,12 @@ public class User{
      */
     public void setLastSignIn(String LSI){
         this.lastSignIn = LSI;
+        this.firstTime = new Date();
     }
     
     /**
      * Setter method for battlesWon attribute. 
-     * @param won 
+     * @param won the number of wins
      */
     public void setBattlesWon(int won){
         this.battlesWon = won;
@@ -46,7 +57,7 @@ public class User{
 
     /**
      * Setter method for the battlesLost attribute. 
-     * @param lost
+     * @param lost the number of loses
      */
     public void setBattlesLost(int lost){
         this.battlesLost = lost;
@@ -67,6 +78,7 @@ public class User{
     public void setGameCompletions(int completions){
         this.userGameCompletions = completions; 
     }
+
     /** 
      * Getter method for obtaining user's PIN. 
      * @return username as a String
@@ -115,11 +127,74 @@ public class User{
     }
 
     /**
-     * Getter method for the amount of times the user has completed the game. 
+     * Getter method for the amount of times the user has completed the game.
      * @return int value of the number of times user has completed game. 
      */
     public int getGameCompletions(){
         return userGameCompletions; 
     }
 
+    public void updatePlaytime() {
+        Date secondTime = new Date();
+        long playTime = (secondTime.getTime() - firstTime.getTime());
+        playTime = playTime / 1000 / 60 / 60 / 24;
+        TotalPlaytime += (int) playTime;
+    }
+
+    public void setState(String state) {
+        this.State = state;
+    }
+
+    public String getState(){
+        return State;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public String setFirstName() {
+        return firstName;
+    }
+
+    public void setLoginTime(String loginTime) {
+        this.loginTime = loginTime;
+    }
+    public String getLoginTime() {
+        return loginTime;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public String getLastName(){
+        return lastName;
+    }
+
+    public void setTotalPlaytime(String totalPlaytime) {
+        this.TotalPlaytime = Integer.parseInt(totalPlaytime);
+    }
+    public String getTotalPlaytime(){
+        return String.valueOf(TotalPlaytime);
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+    public String getCity(){
+        return city;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+    public String getZip(){
+        return zip;
+    }
+
+    public void setDOB(String dateOfBirth) {
+        this.DOB = dateOfBirth;
+    }
+    public String getDOB(){
+        return DOB;
+    }
 }

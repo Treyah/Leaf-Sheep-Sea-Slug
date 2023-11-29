@@ -13,6 +13,7 @@ import java.util.Random;
 class Dungeon {
 
     private Map<String, Map<String, String>> map;
+    private List<Enemy> enemies = new ArrayList<>();
 
     /**
      * This method sets the dungeonMap gathered from the Utility Class
@@ -62,7 +63,7 @@ class Dungeon {
                             System.out.print("$ ");
                             break;
                         default:
-                            System.out.print(cellValue);
+                            System.out.print(cellValue + " ");
                     }
                 }
             }
@@ -113,7 +114,7 @@ class Dungeon {
                     String colKey = cellEntry.getKey();
                     if (Integer.parseInt(rowKey) == playerRow && Integer.parseInt(colKey) == playerCol) {
                         // If the cell has been explored, it will appear as "x"
-                        rowMap.put(colKey, "x ");
+                        rowMap.put(colKey, "x");
                     }
                 }
             }
@@ -139,28 +140,43 @@ class Dungeon {
 
     /**
      * Randomize items in a chest at the specified location.
-     *
-     * @param chestRow The row coordinate of the chest.
-     * @param chestCol The column coordinate of the chest.
      */
-    public void generateRandomItem(int chestRow, int chestCol) {
-        if (isMovePossible(chestRow, chestCol)) {
-            String rowKey = String.valueOf(chestRow);
-            String colKey = String.valueOf(chestCol);
+    public void generateRandomItem(Player player) {
+        List<String> items = new ArrayList<>(Arrays.asList("Sword Upgrade", "Health Upgrade", "Clear Potion", "Health Potion", "Smoke Bomb", "Coins"));
+        Random random = new Random();
+        String randomItem = items.get(random.nextInt(items.size()));
 
-            if (map.containsKey(rowKey) && map.get(rowKey).containsKey(colKey) && map.get(rowKey).get(colKey).equals("0")) {
-                List<String> items = new ArrayList<>(Arrays.asList("Sword Upgrade", "Health Upgrade", "Clear Potion", "Smoke Bomb", "Coins"));
+        System.out.println("You found: " + randomItem);
 
-                Random random = new Random();
-                String randomItem = items.get(random.nextInt(items.size()));
-
-                // Updates the chest with the random item
-                map.get(rowKey).put(colKey, randomItem);
-
-                System.out.println("You found: " + randomItem);
-                printMap();
-            }
+        switch (randomItem) {
+            case "Sword Upgrade" -> player.addItem(new Sword(randomItem), 1);
+            case "Health Upgrade" -> player.addItem(new Heart(randomItem), 1);
+            case "Clear Potion" -> player.addItem(new clearPotion(randomItem), 1);
+            case "Health Potion" -> player.addItem(new healthPotion(randomItem), 1);
+            case "Smoke Bomb" -> player.addItem(new smokeBomb(randomItem),1);
+            case "Coins" -> player.addItem(new Coin(randomItem),1);
         }
     }
 
+    public void setEnemies(List<Enemy> enemies){
+        this.enemies = enemies;
+    }
+
+    public Enemy generateEnemy() {
+        Random rand = new Random();
+        int enemyRand = rand.nextInt(21);
+        if(enemyRand < 6){
+            return enemies.get(0);
+        }else if(enemyRand < 11){
+            return enemies.get(1);
+        }else if(enemyRand < 15){
+            return enemies.get(2);
+        }else if(enemyRand < 18){
+            return enemies.get(3);
+        }else if(enemyRand < 20){
+            return enemies.get(4);
+        }else{
+            return enemies.get(5);
+        }
+    }
 }
