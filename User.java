@@ -134,9 +134,10 @@ public class User{
         return userGameCompletions; 
     }
 
+
     /**
      * updates the total playtime of the user
-     */
+     **/
     public void updatePlaytime() {
         Date secondTime = new Date();
         int playTime = (secondTime.getHours() - firstTime.getHours());
