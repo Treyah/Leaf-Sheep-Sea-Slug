@@ -1,3 +1,7 @@
+/**
+ * Subclass of Item that clears any status effects
+ * @author Hector Jimenez
+ */
 public class clearPotion extends Item{
     public clearPotion(String name) {
         super(name);

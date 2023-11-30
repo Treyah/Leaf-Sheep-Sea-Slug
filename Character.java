@@ -1,3 +1,9 @@
+/**
+ * The character class is an abstract class that takes the
+ * common characteristics of both player and enemy class
+ * to avoid redundancy
+ * @author Hector Jimenez
+ */
 public abstract class Character {
     protected String name;
     protected int attackPower;

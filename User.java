@@ -86,9 +86,9 @@ public class User{
     public String getUsername(){
         return username;
     }
-    
-    /** 
-     * Getter method for obtaining user's PIN. 
+
+    /**
+     * Getter method for obtaining user's PIN.
      * @return PIN as String
      */
     public String getPin(){
@@ -134,11 +134,13 @@ public class User{
         return userGameCompletions; 
     }
 
+    /**
+     * updates the total playtime of the user
+     */
     public void updatePlaytime() {
         Date secondTime = new Date();
-        long playTime = (secondTime.getTime() - firstTime.getTime());
-        playTime = playTime / 1000 / 60 / 60 / 24;
-        TotalPlaytime += (int) playTime;
+        int playTime = (secondTime.getHours() - firstTime.getHours());
+        TotalPlaytime += playTime;
     }
 
     public void setState(String state) {

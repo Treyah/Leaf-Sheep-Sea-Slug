@@ -26,11 +26,15 @@ public class RunGame {
         }else{
             utility.userDataFile("Users.csv");
         }
-        dungeon.setEnemies(utility.getEnemies());
+
 
         main_menu();
     }
 
+    /**
+     * The main_menu method displays the options of
+     * registering or logging in to the user
+     */
     private static void main_menu() {
         System.out.println("-----Main Menu-----");
         System.out.println("a. Register");
@@ -76,7 +80,7 @@ public class RunGame {
         System.out.print("State (ex. TX): ");
         String state = sc.next();
         System.out.print("City: ");
-        String city = sc.nextLine();
+        String city = sc.nextgit ();
         System.out.print("Zip Code: ");
         String zip = sc.next();
         System.out.print("Date of Birth (mm/dd/yy): ");
@@ -127,6 +131,11 @@ public class RunGame {
         }
     }
 
+    /**
+     * The login_menu method displays a menu were the user
+     * who is valid to play the game can continue a previous game
+     * or start a new one
+     */
     public static void login_menu(){
         System.out.println("-----Main Menu-----");
         System.out.println("a. Continue");
@@ -181,6 +190,7 @@ public class RunGame {
         player.setHP(10);
         player.setAttackPower(1);
         dungeon.setMap(utility.readDungeon("Dungeon.csv"));
+        Log.msg("User " + user.getUsername() + " started a new game");
         game();
     }
 
@@ -190,6 +200,7 @@ public class RunGame {
     public static void load_game(){
         dungeon.setMap(utility.readDungeon(user.getUsername()+"savedDungeon.csv"));
         player = utility.getSavedPlayer(user.getUsername()+"Player.csv");
+        Log.msg("User " + user.getUsername() + " loaded a saved game ");
         game();
     }
 
@@ -222,12 +233,15 @@ public class RunGame {
                     break;
                 case "-1":
                     saveGame();
-                    login_menu();
                     game = -1;
+                    login_menu();
                     break;
                 default:
                     System.out.println("This is invalid input");
                     break;
+            }
+            if(player.getHP() <= 0){
+                break;
             }
 
         }
@@ -248,19 +262,28 @@ public class RunGame {
             y += yChange;
             dungeon.updatePlayerPosition(y, x);
             player.setPosition(x, y);
+            Log.msg("User " + user.getUsername() + " : " + player.getName() + " moved to (" + x + ", " + y + ") in the dungeon");
+
             Random random = new Random();
-            int itemChance = random.nextInt(5);
-            if(itemChance == 1){
+            int spawn = random.nextInt(5);
+            if(spawn == 1){
+                //spawn an item
+                Log.msg("User " + user.getUsername() + " : " + player.getName() + " found an item");
                 dungeon.generateRandomItem(player);
                 user.setItemTotalNum(user.getItemTotalNum()+1);
-            }
-            int enemyChance = random.nextInt(7);
-            if(enemyChance == 1){
+            }else if(spawn == 2){
+                //spawn an enemy
+                dungeon.setEnemies(utility.getEnemies());
                 Enemy enemy = dungeon.generateEnemy();
+                Log.msg("User " + user.getUsername() + " : " + player.getName() + "encountered " + enemy.getName());
                 new Battle_System().Start(player, enemy, user);
+            }else if(spawn == 3){
+                //spawn merchant
+                Log.msg("User " + user.getUsername() + " : " + player.getName() + " met a merchant");
+                new Merchant().start(player);
             }
         }else{
-            System.out.println("Can not go there!");
+            System.out.println("Can not go there");
         }
     }
 
@@ -270,6 +293,7 @@ public class RunGame {
     private static void saveGame() {
         String saveFile = user.getUsername();
         utility.saveGame(saveFile, dungeon, player);
+        Log.msg("User " + user.getUsername() + " saved game");
     }
 
 }

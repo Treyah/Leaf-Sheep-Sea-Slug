@@ -64,19 +64,7 @@ public class Player extends Character implements Behaivor{
         for (Map.Entry<Item, Integer> entry : inventory.entrySet()) {
             if(entry.getKey().itemNameGetter().equals(choice)){
                 Item item = entry.getKey();
-                if(item.getClass().equals(smokeBomb.class)){
-                    if(enemy != null) {
-                        item.use(enemy);
-                        removeItem(item, 1);
-                        break;
-                    }else{
-                        System.out.println("Can only be used in battle");
-                    }
-                }else{
-                    item.use(this);
-                    removeItem(item, 1);
-                    break;
-                }
+                useItem(item, enemy);
             }
         }
         openInventory(enemy);
@@ -107,14 +95,17 @@ public class Player extends Character implements Behaivor{
      * this currently assumes item is used with something like item.use() to apply effects
      * @param item the item to use
      */
-    public void useItem(Item item) {
-        if (inventory.containsKey(item) && inventory.get(item) > 0) {
-            // this currently assumes item is used with something like item.use() to apply effects
-            //item.use();
+    public void useItem(Item item, Character enemy) {
+        if(item.getClass().equals(smokeBomb.class)){
+            if(enemy != null) {
+                item.use(enemy);
+                removeItem(item, 1);
+            }else{
+                System.out.println("Can only be used in battle");
+            }
+        }else{
+            item.use(this);
             removeItem(item, 1);
-            Log.msg("Used " + item.itemNameGetter());
-        } else {
-            Log.msg("Item not available in inventory");
         }
     }
 

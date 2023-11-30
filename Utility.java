@@ -264,6 +264,12 @@ class Utility {
         return enemies;
     }
 
+    /**
+     * This method read a given file where the attributes of a character
+     * were saved and create a new Player class to continue a saved game
+     * @param file the file containing the saved attributes
+     * @return Player ready to continue game
+     */
     public Player getSavedPlayer(String file) {
         Player player = new Player("");
 
@@ -300,6 +306,10 @@ class Utility {
         return player;
     }
 
+    /**
+     * updates a user on the attributes gained during playtime
+     * @param user to update
+     */
     public void updateUser(User user) {
         Map<String, String> userInfo = userDataMap.get(user.getUsername());
         userInfo.put("LastSignIn", user.getLastSignIn());
