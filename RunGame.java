@@ -29,16 +29,9 @@ public class RunGame {
         dungeon.setEnemies(utility.getEnemies());
 
         main_menu();
-
-
     }
 
-    /**
-     * The main_menu method takes charge of display the options the users
-     * can take before starting a game
-     */
-    public static void main_menu(){
-
+    private static void main_menu() {
         System.out.println("-----Main Menu-----");
         System.out.println("a. Register");
         System.out.println("b. Login");
@@ -62,6 +55,7 @@ public class RunGame {
             default:
                 System.out.println("This input is invalid. Try Again.");
                 main_menu();
+                break;
         }
     }
 
@@ -104,9 +98,6 @@ public class RunGame {
         String username = sc.next();
         System.out.print("Enter PIN: ");
         String pin = sc.next();
-
-
-
         if(utility.checkUser(username, pin)){
             user = utility.getUser(username);
             String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
@@ -203,34 +194,82 @@ public class RunGame {
     }
 
     /**
-     * The load_game reads the save file to restore the previous game the user left
+     * The game method controls the flow of the game updating the log.
      */
-    public static void load_game(){
-        dungeon.setMap(utility.readDungeon(user.getUsername()+"savedDungeon.csv"));
-        game();
+    public static void game(){
+        int[] position = player.getPosition();
+        dungeon.updatePlayerPosition(position[1], position[0]);
+        int game = 1;
+        while(game == 1){
+            dungeon.printMap();
+            System.out.println("Use WASD and the Enter key to move across the dungeon. Enter i to open Inventory(Enter -1 to exit to menu)");
+            String input = sc.next();
+            switch (input){
+                case "w":
+                    move_player(0, -1);
+                    break;
+                case "s":
+                    move_player(0, 1);
+                    break;
+                case "a":
+                    move_player(-1, 0);
+                    break;
+                case "d":
+                    move_player(1, 0);
+                    break;
+                case "i":
+                    player.openInventory(null);
+                    break;
+                case "-1":
+                    saveGame();
+                    login_menu();
+                    game = -1;
+                    break;
+                default:
+                    System.out.println("This is invalid input");
+                    break;
+            }
+
+        }
+    }
+    /**
+     * The move_player method move the player if possible to the direction inputted by the user
+     * @param xChange takes the change that will be made to the x coordinate
+     * @param yChange takes the change that will be made to the y coordinate
+     */
+    public static void move_player(int xChange, int yChange){
+        int[] position = player.getPosition();
+        int x = position[0];
+        int y = position[1];
+        dungeon.updatePlayerPosition(y, x);
+        if(dungeon.isMovePossible(y + yChange, x + xChange)){
+            dungeon.updateExploredCell(y, x);
+            x += xChange;
+            y += yChange;
+            dungeon.updatePlayerPosition(y, x);
+            player.setPosition(x, y);
+            Random random = new Random();
+            int itemChance = random.nextInt(5);
+            if(itemChance == 1){
+                dungeon.generateRandomItem(player);
+                user.setItemTotalNum(user.getItemTotalNum()+1);
+            }
+            int enemyChance = random.nextInt(7);
+            if(enemyChance == 1){
+                Enemy enemy = dungeon.generateEnemy();
+                new Battle_System().Start(player, enemy, user);
+            }
+        }else{
+            System.out.println("Can not go there!");
+        }
     }
 
     /**
-     * The game method controls the flow of the game updating the log.
+     * The saveGame method save the current state of the dungeon for future use.
      */
-    private static void game() {
-        int x;
-        int y;
-        while(true){
-            dungeon.printMap();
-            System.out.print("Enter the room you want to go into as 'x y'. enter '-1 -1' to exit to main menu\n> ");
-            x = sc.nextInt();
-            y = sc.nextInt();
-            if(x == -1 || y == -1){
-                if(!user.getUsername().equals("unknown")) {
-                    login_menu();
-                }else {
-                    main_menu();
-                }
-                break;
-            }
-            //dungeon.placePlayer(x, y);
-            Log.msg("User "+ user.getUsername() + " player moved to ("+x+", "+y+") in the dungeon");
-        }
+    private static void saveGame() {
+        String saveFile = user.getUsername();
+        utility.saveGame(saveFile, dungeon, player);
     }
+
 }
