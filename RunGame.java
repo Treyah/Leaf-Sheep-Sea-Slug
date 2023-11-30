@@ -26,6 +26,7 @@ public class RunGame {
         }else{
             utility.userDataFile("Users.csv");
         }
+        dungeon.setEnemies(utility.getEnemies());
 
 
         main_menu();
@@ -273,7 +274,6 @@ public class RunGame {
                 user.setItemTotalNum(user.getItemTotalNum()+1);
             }else if(spawn == 2){
                 //spawn an enemy
-                dungeon.setEnemies(utility.getEnemies());
                 Enemy enemy = dungeon.generateEnemy();
                 Log.msg("User " + user.getUsername() + " : " + player.getName() + "encountered " + enemy.getName());
                 new Battle_System().Start(player, enemy, user);

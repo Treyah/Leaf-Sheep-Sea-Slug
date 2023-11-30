@@ -20,6 +20,7 @@ public class Battle_System {
     public void Start(Player player, Enemy enemy, User user){
         this.player = player;
         this.enemy = enemy;
+        int enemyHp = enemy.getHP();
         while (player.getHP() > 0 && enemy.getHP() > 0) {
             System.out.println(enemy.getName() + " HP: " + enemy.getHP() + "\n");
             System.out.println("Player HP: " + player.getHP());
@@ -49,6 +50,7 @@ public class Battle_System {
             System.out.println("You Can  Continue in this World or Create a new game in main menu");
             Log.msg("User " + user.getUsername() + " : " + player.getName() + " beat the game");
         }
+        enemy.setHP(enemyHp);
     }
 
     /**
