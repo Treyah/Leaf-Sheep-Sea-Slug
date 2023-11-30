@@ -135,8 +135,8 @@ public class User{
     }
     
     /**
-     * Setter method used to update the user's total playtime.
-     * 
+     * Method used to update the user's total playtime.
+     * This is done through saving a Date object as well as platime long. 
      */
     public void updatePlaytime() {
         Date secondTime = new Date();
@@ -145,59 +145,130 @@ public class User{
         TotalPlaytime += (int) playTime;
     }
 
+    /**
+     * Sets the state the player is in. 
+     * @param state such as TX, CA, CT, etc.
+     */
     public void setState(String state) {
         this.State = state;
     }
 
+    /**
+     * Getter method that retrieves what state the player lives in. 
+     * @return State
+     */
     public String getState(){
         return State;
     }
 
+    /**
+     * Set's the player's first name
+     * @param firstName is given as a string. 
+     */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
-    public String setFirstName() {
+
+    /**
+     * Getter method for the player's first name.
+     * @return firstName is returned as a string. 
+     */
+    public String getFirstName() {
         return firstName;
     }
 
+    /**
+     * Setter method for the player's login time. 
+     * @param loginTime
+     */
     public void setLoginTime(String loginTime) {
         this.loginTime = loginTime;
     }
+
+    /**
+     * Getter method for the player's Login Time
+     * @return loginTime
+     */
     public String getLoginTime() {
         return loginTime;
     }
 
+    /**
+     * Setter method for the Last Name.  
+     * @param lastName will be used to set the attribute lastName.
+     */
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    /**
+     * Getter method for Player's Last Name.
+     * @return lastName
+     */
     public String getLastName(){
         return lastName;
     }
 
+    /**
+     * Setter method for player's total play time. 
+     * @param totalPlaytime
+     */
     public void setTotalPlaytime(String totalPlaytime) {
         this.TotalPlaytime = Integer.parseInt(totalPlaytime);
     }
+
+    /**
+     * Getter method for Total Play time. 
+     * @return String of play time. 
+     */
     public String getTotalPlaytime(){
         return String.valueOf(TotalPlaytime);
     }
 
+    /**
+     * Setter method for city that the player lives in.
+     * @param city
+     */
     public void setCity(String city) {
         this.city = city;
     }
+    
+    /**
+     * Getter method for the player's city that will return player's city as a string. 
+     * @return city as a String. 
+     */
     public String getCity(){
         return city;
     }
 
+    /**
+     * Setter method for the player's zipcode. 
+     * @param zip string value
+     */
     public void setZip(String zip) {
         this.zip = zip;
     }
+
+    /**
+     * Getter method for the player's zipcode. 
+     * @return
+     */
     public String getZip(){
         return zip;
     }
 
+    /**
+     * Setter method for the player's Date of Birth. 
+     * @param dateOfBirth will be in string format. 
+     */
     public void setDOB(String dateOfBirth) {
         this.DOB = dateOfBirth;
     }
+
+    /**
+     * Getter method for the player's DOB. Will return a string value.
+     * @return DOB
+     */
     public String getDOB(){
         return DOB;
     }

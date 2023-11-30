@@ -18,6 +18,10 @@ public abstract class Item {
         this.itemName = x; 
     }
 
+    /**
+     * Getter method for 
+     * @return
+     */
     public String itemNameGetter(){
         return itemName; 
     }
