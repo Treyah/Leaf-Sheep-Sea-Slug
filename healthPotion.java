@@ -1,3 +1,7 @@
+/**
+ * Subclass of Item that heals the player
+ * @author Hector Jimenez
+ */
 public class healthPotion extends Item{
     public healthPotion(String name) {
         super(name);
@@ -11,5 +15,6 @@ public class healthPotion extends Item{
         }
         System.out.println(player.getName()+ " used " + itemNameGetter());
         System.out.println("Health Restored");
+        System.out.println("Health Point: " + player.getHP() + "/" + player.getMaxHP());
     }
 }

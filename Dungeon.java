@@ -162,6 +162,10 @@ class Dungeon {
         this.enemies = enemies;
     }
 
+    /**
+     * generate a random enemy to fight player
+     * @return Enemy
+     */
     public Enemy generateEnemy() {
         Random rand = new Random();
         int enemyRand = rand.nextInt(21);

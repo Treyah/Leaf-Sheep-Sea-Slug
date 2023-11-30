@@ -18,7 +18,7 @@ public class Enemy extends Character implements Behaivor{
         this.attackPower = attackPower;
     }
 
-    public void useItem(Item item) {
+    public void useItem(Item item, Character character) {
         //stud
     }
 

@@ -1,3 +1,7 @@
+/**
+ * Subclass of Item that lowers the attack power of enemy
+ * @author Hector Jimenez
+ */
 public class smokeBomb extends Item{
     public smokeBomb(String name) {
         super(name);

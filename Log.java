@@ -57,13 +57,6 @@ public class Log {
         }
     }
 
-    /*
-    public static void main(String[] args) {
-        Log.msg("This is a regular message.");
-        Log.error("This is an error.");
-    }
-    */
-
 }
 
 
