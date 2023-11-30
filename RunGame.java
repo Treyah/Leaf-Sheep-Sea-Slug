@@ -76,7 +76,7 @@ public class RunGame {
         System.out.print("State (ex. TX): ");
         String state = sc.next();
         System.out.print("City: ");
-        String city = sc.nextLine();
+        String city = sc.next();
         System.out.print("Zip Code: ");
         String zip = sc.next();
         System.out.print("Date of Birth (mm/dd/yy): ");
@@ -128,7 +128,7 @@ public class RunGame {
     }
 
     public static void login_menu(){
-        System.out.println("-----Main Menu-----");
+        System.out.println("-----Player Menu-----");
         System.out.println("a. Continue");
         System.out.println("b. New Game");
         System.out.println("c. Logout");

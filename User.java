@@ -133,7 +133,11 @@ public class User{
     public int getGameCompletions(){
         return userGameCompletions; 
     }
-
+    
+    /**
+     * Setter method used to update the user's total playtime.
+     * 
+     */
     public void updatePlaytime() {
         Date secondTime = new Date();
         long playTime = (secondTime.getTime() - firstTime.getTime());
